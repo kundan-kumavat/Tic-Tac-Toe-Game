@@ -1,35 +1,37 @@
 # Tic-Tac-Toe Backend Application
 
-### **Overview **
+### **Overview**
 This project implements a backend for a Tic-Tac-Toe game, providing features such as user authentication, gameplay management, and game history tracking.
 
-### **Features **
+### **Features**
 - User registration and login with secure authentication.
 - Real-time turn-based gameplay.
 - Game history with detailed timelines of each move.
 - Flexible database schema for scalability.
 
-### **Design Approach **
+### **Design Approach**
 1. **Authentication**: Secured with JWT to ensure safe user authentication.
 2. **Game Logic**: Rules enforced on the server to maintain integrity and fairness.
 3. **Database Design**:
 - Users: Stores player data.
 - Games: Tracks active and completed games, including moves timeline.
 
-### **Assumptions **
+### **Assumptions**
 1. Each game involves exactly two players.
 2. The starting player automatically get their symbol as 'X'.
 3. Games detect a winner or a draw based on moves.
 4. The starting player will play first.
 
-### **Tech Stack **
+### **Tech Stack**
 - Backend: Node.js, Express.js
 - Database: MongoDB
 - Authentication: JWT
 - Techologies/Libraries: bcrypt, mongoose, dotenv, multer, cloudinary
 
-### **Steps to run locally **
+### **Steps to run locally**
 Refer to SETUP.md file for detailed instructions on installation and setup.
+
+
 
 
 ### BASE URL : http://localhost:3000/api/v1/
