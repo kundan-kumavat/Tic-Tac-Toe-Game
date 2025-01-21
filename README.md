@@ -43,7 +43,7 @@ This project implements a backend for a Tic-Tac-Toe game, providing features suc
 - Cloudinary: For managing image uploads (if applicable).
 - Multer: For handling file uploads.
 
-### **External Libraries and APIs**
+### **Incomplete features**
 - Real-time gameplay updates through WebSockets.
 - Detailed analytics of player performance.
 - Integration of AI for single-player mode.
