@@ -29,10 +29,7 @@ This project implements a backend for a Tic-Tac-Toe game, providing features suc
 - Techologies/Libraries: bcrypt, mongoose, dotenv, multer, cloudinary
 
 ### **Steps to run locally**
-Refer to SETUP.md file for detailed instructions on installation and setup.
-
-
-
+Refer to `SETUP.md` file for detailed instructions on installation and setup.
 
 ### BASE URL : http://localhost:3000/api/v1/
 
@@ -175,5 +172,12 @@ The API provides descriptive error messages for invalid requests. For example:
   ```json
   {
     "message": "Required fields are missing"
+  }
+  ```
+
+- **Sample Error Response** (Unauthorized access):
+  ```json
+  {
+    "message": "Unathorized user"
   }
   ```
