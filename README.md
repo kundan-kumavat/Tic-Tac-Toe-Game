@@ -8,6 +8,7 @@ This project implements a backend for a Tic-Tac-Toe game, providing features suc
 - Real-time turn-based gameplay.
 - Game history with detailed timelines of each move.
 - Flexible database schema for scalability.
+- CRUD operation for user profile
 
 ### **Design Approach**
 1. **Authentication**: Secured with JWT to ensure safe user authentication.
@@ -15,6 +16,13 @@ This project implements a backend for a Tic-Tac-Toe game, providing features suc
 3. **Database Design**:
 - Users: Stores player data.
 - Games: Tracks active and completed games, including moves timeline.
+4. **Architecture**:
+- The app follows a modular structure for better maintainability:
+  - Routes: Defines API endpoints.
+  - Controllers: Handles business logic.
+  - Models: Manages database interactions.
+  - Middleware: For authentication and error handling and image uploading.
+  - Utils: For the utility of the app
 
 ### **Assumptions**
 1. Each game involves exactly two players.
@@ -26,12 +34,69 @@ This project implements a backend for a Tic-Tac-Toe game, providing features suc
 - Backend: Node.js, Express.js
 - Database: MongoDB
 - Authentication: JWT
-- Techologies/Libraries: bcrypt, mongoose, dotenv, multer, cloudinary
+
+### **External Libraries and APIs**
+- Mongoose: For MongoDB interactions.
+- Cors: To enable cross-origin requests.
+- Bcrypt: For secure password hashing.
+- Nodemon: For development with live-reloading.
+- Cloudinary: For managing image uploads (if applicable).
+- Multer: For handling file uploads.
+
+### **External Libraries and APIs**
+- Real-time gameplay updates through WebSockets.
+- Detailed analytics of player performance.
+- Integration of AI for single-player mode.
 
 ### **Steps to run locally**
 Refer to `SETUP.md` file for detailed instructions on installation and setup.
 
 ### BASE URL : http://localhost:3000/api/v1/
+
+# Database Schema Description
+
+#### MongoDB Collections
+
+1. **Users Collection**
+
+- Stores user details.
+
+```json
+  {
+    "_id": "ObjectId",
+    "username": "string",
+    "password": "string",
+    "created_at": "ISODate",
+    "fullName": "string",
+    "age": "number",
+    "gender": "string",
+    "country": "string",
+    "avatar": "string"
+  }
+```
+
+2. **Games Collection**
+
+- Records game details including participants, status, and winner.
+
+```json
+  {
+  "_id": "ObjectId",
+  "players": ["ObjectId", "ObjectId"],
+  "status": "string",
+  "winner": "ObjectId",
+  "created_at": "ISODate",
+  "moves": [
+      {
+          "player": "ObjectId",
+          "position": {"row": "number", "col": "number"},
+          "_id": "ObjectId"
+      }
+  ]
+  }
+```
+
+---
 
 ## **Sample Header Section**
 - Passes the access token in the header section whenever required to authenticate user before accessing any features.

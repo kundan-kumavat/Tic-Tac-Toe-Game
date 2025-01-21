@@ -7,15 +7,22 @@ const verifyJWT = async(req, res, next) => {
     let token = req.headers.authorization;
     try {
 
+        // check for the token
         if(token){
+
+            // Extracting the token value
             token = token.split(" ")[1];
+
+            // Decoding the token
             let decodedToken = jwt.verify(token, SECRET_TOKEN);
 
+            // Finding the user based on id
             const user = await User.findById(decodedToken?._id).select("-password")
             if(!user){
                 return res.status(401).json({message: "Invlaid token"});
             }
 
+            // Adding user to the request
             req.user = user;
             
         }else{
@@ -24,6 +31,7 @@ const verifyJWT = async(req, res, next) => {
             });
         }
 
+        // Calling next function
         next();
 
     } catch (error) {

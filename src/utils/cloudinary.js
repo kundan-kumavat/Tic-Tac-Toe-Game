@@ -14,6 +14,7 @@ const uploadOnCloudinary = async (localFilePath) => {
 
         if (!localFilePath) return null;
 
+        // Uploading image
         const response = await cloudinary.uploader.upload(localFilePath, {
             resource_type: 'auto',
         })
@@ -22,6 +23,7 @@ const uploadOnCloudinary = async (localFilePath) => {
             });
         // console.log(response);
 
+        // removing the image from the system
         fs.unlinkSync(localFilePath);
         return response;
     } catch (error) {
@@ -43,6 +45,7 @@ const deletOnCloudinary = async (oldImage) => {
 
         if (!oldImage) return null;
 
+        // delete the image
         await cloudinary.api
         .delete_resources(
             [oldImage],

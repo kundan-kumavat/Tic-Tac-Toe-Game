@@ -2,24 +2,29 @@ const mongoose = require('mongoose');
 
 const gameSchema = new mongoose.Schema(
     {
+        // list of players
         players: [
             {
-                type: mongoose.Schema.Types.ObjectId,
+                type: mongoose.Schema.Types.ObjectId, 
                 ref: 'User'
             }
         ],
+        // Empty board
         board: {
             type: [[String]],
             default: [['', '', ''], ['', '', ''], ['', '', '']]
         },
+        // current player turn
         currentPlayer: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
         },
+        // winner of the game
         winner: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
         },
+        // moves played during the game
         moves: [
             {
                 player: {
@@ -32,6 +37,7 @@ const gameSchema = new mongoose.Schema(
                 }
             }
         ],
+        // current status of the game
         status: {
             type: String,
             default: 'ongoing'

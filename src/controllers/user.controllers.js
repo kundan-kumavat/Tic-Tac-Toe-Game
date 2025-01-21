@@ -3,6 +3,7 @@ const bcyrpt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { uploadOnCloudinary, deletOnCloudinary } = require('../utils/cloudinary.js');
 
+// register controller
 const registerUser = async(req, res) => {
     const {username, password} = req.body;
 
@@ -13,6 +14,7 @@ const registerUser = async(req, res) => {
     };
 
     try {
+        // check if user already exists
         const existingUser = await User.findOne({
             username: username
         });
@@ -22,9 +24,11 @@ const registerUser = async(req, res) => {
                 message: 'User already exits'
             })
         };
-    
+
+        // Hash the password
         const hashedPassword = await bcyrpt.hash(password, 10);
     
+        // Create new user
         const user = new User({
             username: username,
             password: hashedPassword
@@ -32,6 +36,7 @@ const registerUser = async(req, res) => {
     
         await user.save();
 
+        // Generate Access Token
         const token = await jwt.sign(
             {
                 _id: user._id,
@@ -42,7 +47,8 @@ const registerUser = async(req, res) => {
                 expiresIn: process.env.ACCESS_TOKEN_EXPIRY
             }
         )
-    
+
+        // return the response
         return res.status(201).json({
             message: "User registered successfully",
             data: user,
@@ -59,6 +65,7 @@ const registerUser = async(req, res) => {
 
 }
 
+// Login controller
 const loginUser = async(req, res) => {
     const { username, password} = req.body;
 
@@ -69,16 +76,20 @@ const loginUser = async(req, res) => {
     };
 
     try {
+
+        // Check for the user
         const user = await User.findOne({
             username
         });
 
+        // If user not found
         if(!user){
             return res.status(404).json({
                 message: "User dose not exits!"
             })
         };
 
+        // Check if password is correct
         const isPasswordCorrect = await bcyrpt.compare(password, user.password);
 
         if(!isPasswordCorrect){
@@ -87,6 +98,7 @@ const loginUser = async(req, res) => {
             })
         };
 
+        // Generate access token
         const token = jwt.sign(
             {
                 _id: user._id,
@@ -98,6 +110,7 @@ const loginUser = async(req, res) => {
             }
         );
 
+        // return the response
         return res.status(200).json({
             message: "User logged in successfully",
             token: token
@@ -111,27 +124,33 @@ const loginUser = async(req, res) => {
     }
 }
 
+// Profile controllers(Create)
 const addProfileDetails = async(req, res) => {
     const {fullName, gender, age, country} = req.body
     
+    // Check if required fileds are empty
     if([fullName, gender, age, country].some((field) => field?.trim() === '')){
         return res.status(400).json({message: "fileds are empty"});
     }
 
     try {
+        // Find the user
         const user = await User.findById(req.user?._id);
 
+        // Take image path from request
         const avatarLocalPath = req.files?.avatar[0]?.path;
 
         if(!avatarLocalPath){
             return res.status(400).json({ message: "Avatar image is required" });
         }
 
+        //upload image on cloudinary
         const avatar = await uploadOnCloudinary(avatarLocalPath);
         if (!avatar) {
             return res.status(400).json({ message: "Error occured while uploading on the avatar" })
         }
 
+        // Saving data to the user in Database
         user.fullName = fullName;
         user.gender = gender;
         user.age = age;
@@ -140,10 +159,12 @@ const addProfileDetails = async(req, res) => {
 
         
         await user.save();
-
+        
+        // Fetch the user details
         const userDetails = await User.findById(req.user?._id);
 
-        return res.status(200).json({
+        // return the response
+        return res.status(201).json({
             message: "User details added successfully",
             data: userDetails
         });
@@ -156,9 +177,11 @@ const addProfileDetails = async(req, res) => {
     }
 }
 
+// Profile controller(Update)
 const updateUserDetails = async(req, res) => {
     const updateData = req.body;
 
+    // check if fields are empty
     if(!Object.keys(updateData)?.length){
         return res.status(400).json({
             message: "No fields to update"
@@ -166,8 +189,10 @@ const updateUserDetails = async(req, res) => {
     }
 
     try {
+        // finding the user
         const user = await User.findById(req.user?._id);
 
+        // Updating the data
         const data = await User.findByIdAndUpdate(
             user._id,
             {
@@ -184,6 +209,7 @@ const updateUserDetails = async(req, res) => {
             })
         }
 
+        // return the response
         return res.status(200).json({
             message: "Account Details updated successfully",
             user: data
@@ -196,21 +222,28 @@ const updateUserDetails = async(req, res) => {
     }
 };
 
+// Profile controller(Update Image)
 const updateUserAvatar = async (req, res) => {
     const avatarLocalPath = req.file?.path;
 
+    // check if image is null
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar file is missing")
     }
 
+    // finding the user
     const user = await User.findById(req.user?._id);
 
+    // Get pervious Image
     const previousImageUrl = user?.avatar;
+
+    // Extracting the image name from url
     const previousPublicId = previousImageUrl
     ?.split("/")
     .slice(-1)[0] 
     .split(".")[0];
 
+    // Deleting the pervious image stored on cloudinary
     const deletePreviousAvatar = await deletOnCloudinary(previousPublicId);
 
     if(!deletePreviousAvatar){
@@ -219,27 +252,34 @@ const updateUserAvatar = async (req, res) => {
         })
     }
 
+    // Uploading new image
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
     if(!avatar.url){
         throw new ApiError(400, "Error on uploading on avatar")
     }
 
+    // updating the image
     user.avatar = avatar?.url;
 
+    // saving the changes
     await user.save({
         validateBeforeSave: false
     });
 
+    // return the response
     return res.status(200).json( 
         { message: "User profile updated successfully" }
     )
 }
 
+// Profile controller(Read)
 const getUserDetails = async(req, res) => {
     try {
+        // finding the user
         const user = await User.findById(req.user?._id);
 
+        // return the user details
         return res.status(200).json({
             message: "User found successfully",
             data: user
@@ -252,16 +292,20 @@ const getUserDetails = async(req, res) => {
     }
 }
 
+// Profile controller(Delete)
 const deleteUserDetails = async(req, res) => {
     try {
+        // finding the user
         const user = await User.findById(req.user?._id);
-
+        
+        // Finding user pervious avatar
         const previousImageUrl = user?.avatar;
         const previousPublicId = previousImageUrl
         ?.split("/")
         .slice(-1)[0] 
         .split(".")[0];
 
+        // Deleting the pervious avatar url
         const deletePreviousAvatar = await deletOnCloudinary(previousPublicId);
 
         if(!deletePreviousAvatar){
@@ -270,7 +314,7 @@ const deleteUserDetails = async(req, res) => {
             })
         }
 
-
+        // Deleting user details
         await User.findByIdAndUpdate(user._id,
             {
                 $unset:{
@@ -283,6 +327,7 @@ const deleteUserDetails = async(req, res) => {
             }
         );
 
+        // return the response
         return res.status(200).json({
             message: "User details deleted successfully"
         });
